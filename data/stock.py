@@ -1,10 +1,11 @@
 from jqdatasdk import *
 import pandas as pd
+import datetime
 
 auth('15717929717', 'Pzl123456')  # 账号是申请时所填写的手机号；密码为聚宽官网登录密码
 # 设置行列不忽略
 pd.set_option('display.max_rows', 100000)
-pd.set_option('display.max_columns', 100)
+pd.set_option('display.max_columns', 10000)
 # 上海证券交易所	.XSHG	600519.XSHG	贵州茅台
 # 深圳证券交易所	.XSHE	000001.XSHE	平安银行
 
@@ -38,9 +39,15 @@ pd.set_option('display.max_columns', 100)
 # print(df_week)
 
 '''获取股票财务指标'''
-df = get_fundamentals(query(indicator), statDate='2020')
+# df = get_fundamentals(query(indicator), statDate='2020')
 
 # df.to_csv('/home/damon/PycharmProjects/lhjy/data/finance/finance2020.csv')
 # 基于盈利指标选股： eps,operating_profit,roe,inc_net_profit_year_on_year
-df = df[df['eps'] > 0]
+# df = df[(df['eps'] > 0) & (df['operating_profit'] > 1012173617) &
+#         (df['roe'] > 11) & (df['inc_net_profit_year_on_year'] > 10)]
 
+# print(df)
+
+'''获取股票估值指标'''
+df_valuation = get_fundamentals(query(valuation), statDate=datetime.datetime.today())
+print(df_valuation.head())
