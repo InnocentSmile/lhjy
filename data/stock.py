@@ -10,10 +10,60 @@ pd.set_option('display.max_columns', 10000)
 # 深圳证券交易所	.XSHE	000001.XSHE	平安银行
 
 
+def get_stock_list():
+    '''
+    获取所有A股股票列表
+    :return: stock_list
+    '''
+    stock_list = list(get_all_securities(['stock']).index)
+    return stock_list
 
+
+def get_single_stock_price(code, time_freq, start_date, end_date):
+    '''
+    获取单个股票行情数据
+    :param code:
+    :param timeperiod:
+    :param startdate:
+    :param endate:
+    :return: data
+    '''
+    data = get_price(code, end_date=end_date, start_date=start_date, frequency=time_freq, panel=False)
+    return data
+
+
+def export_stock_price(data, filename):
+    '''
+    导出股票行情数据
+    :param data:
+    :param filename:
+    :return:
+    '''
+    file_root = '/home/damon/PycharmProjects/lhjy/price' + filename + '.csv'
+    data.to_csv(file_root)
+    print('已成功存储至: ', file_root)
+
+
+def transfer_price_freq(data, time_freq):
+    '''
+    将数据转换为指定周期 开盘价（当周第一天） 收盘价（当周最后一天）
+    resample函数
+    转换周期： 日K转换为周K
+    获取周K（当周的）：开盘价（当周第一天） 收盘价（当周最后一天）
+    :return:
+    '''
+    # 原因：虽然已经指定date列为index，把这个index却是字符串来的，要把字符串的index转为时间类型的，才能resample
+    # df = data.set_index(pd.DatetimeIndex(pd.to_datetime(data.time)))
+    # df['weekday'] = df.index.weekday
+    # print(df)
+    df_trans = pd.DataFrame()
+    df_trans['open'] = data['open'].resample(time_freq).first()
+    df_trans['close'] = data['close'].resample(time_freq).last()
+    df_trans['high'] = data['high'].resample(time_freq).max()
+    df_trans['low'] = data['low'].resample(time_freq).min()
+    return df_trans
 #将所有股票列表转换成数组
-# stocks = list(get_all_securities(['stock']).index)
-# print(stocks)
+
 # df = get_price(["600519.XSHG", "000001.XSHE"], end_date='2022-07-20 14:00:00', count=10, frequency='daily',
 #                fields=['open', 'close', 'high', 'low', 'volume', 'money'])
 # print(df)
@@ -22,16 +72,7 @@ pd.set_option('display.max_columns', 10000)
 # resample函数
 # 转换周期： 日K转换为周K
 # 获取周K（当周的）：开盘价（当周第一天） 收盘价（当周最后一天）
-# df = get_price(["000001.XSHG"], end_date='2020-12-31', start_date='2020-01-01', frequency='daily', panel=False)
-# # 原因：虽然已经指定date列为index，把这个index却是字符串来的，要把字符串的index转为时间类型的，才能resample
-# df = df.set_index(pd.DatetimeIndex(pd.to_datetime(df.time)))
-# df['weekday'] = df.index.weekday
-# print(df)
-# df_week = pd.DataFrame()
-# df_week['open'] = df['open'].resample('W').first()
-# df_week['close'] = df['close'].resample('W').last()
-# df_week['high'] = df['high'].resample('W').max()
-# df_week['low'] = df['low'].resample('W').min()
+
 # print(df_week)
 # # 汇总统计： 统计一下月成交量成交额（sum）
 # df_week['volume(sum)'] = df['volume'].resample("W").sum()
