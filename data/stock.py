@@ -6,20 +6,19 @@ auth('15717929717', 'Pzl123456')  # 账号是申请时所填写的手机号；�
 # 设置行列不忽略
 pd.set_option('display.max_rows', 100000)
 pd.set_option('display.max_columns', 10000)
-# 上海证券交易所	.XSHG	600519.XSHG	贵州茅台
-# 深圳证券交易所	.XSHE	000001.XSHE	平安银行
 
 
 def get_stock_list():
     '''
-    获取所有A股股票列表
+    获取所有A股股票列表  上海证券交易所	.XSHG	600519.XSHG	贵州茅台
+                      深圳证券交易所	.XSHE	000001.XSHE	平安银行
     :return: stock_list
     '''
     stock_list = list(get_all_securities(['stock']).index)
     return stock_list
 
 
-def get_single_stock_price(code, time_freq, start_date, end_date):
+def get_single_price(code, time_freq, start_date, end_date):
     '''
     获取单个股票行情数据
     :param code:
@@ -32,14 +31,15 @@ def get_single_stock_price(code, time_freq, start_date, end_date):
     return data
 
 
-def export_stock_price(data, filename):
+def export_data(data, filename, type):
     '''
-    导出股票行情数据
+    导出股票相关数据
     :param data:
     :param filename:
+    :type data: 股票数据类型 可以是： price，finance
     :return:
     '''
-    file_root = '/home/damon/PycharmProjects/lhjy/price' + filename + '.csv'
+    file_root = '/home/damon/PycharmProjects/lhjy/data/' + type + "/" + filename + '.csv'
     data.to_csv(file_root)
     print('已成功存储至: ', file_root)
 
@@ -62,33 +62,24 @@ def transfer_price_freq(data, time_freq):
     df_trans['high'] = data['high'].resample(time_freq).max()
     df_trans['low'] = data['low'].resample(time_freq).min()
     return df_trans
-#将所有股票列表转换成数组
-
-# df = get_price(["600519.XSHG", "000001.XSHE"], end_date='2022-07-20 14:00:00', count=10, frequency='daily',
-#                fields=['open', 'close', 'high', 'low', 'volume', 'money'])
-# print(df)
 
 
-# resample函数
-# 转换周期： 日K转换为周K
-# 获取周K（当周的）：开盘价（当周第一天） 收盘价（当周最后一天）
+def get_single_finance(code, date, statDate):
+    '''
+    获取单个股票财务指标
+    :return:
+    '''
+    data = get_fundamentals(query(indicator).filter(indicator.code == code), date=date, statDate=statDate)
+    return data
 
-# print(df_week)
-# # 汇总统计： 统计一下月成交量成交额（sum）
-# df_week['volume(sum)'] = df['volume'].resample("W").sum()
-# df_week['money(sum)'] = df['money'].resample("W").sum()
-# print(df_week)
 
-'''获取股票财务指标'''
-# df = get_fundamentals(query(indicator), statDate='2020')
-
-# df.to_csv('/home/damon/PycharmProjects/lhjy/data/finance/finance2020.csv')
-# 基于盈利指标选股： eps,operating_profit,roe,inc_net_profit_year_on_year
-# df = df[(df['eps'] > 0) & (df['operating_profit'] > 1012173617) &
-#         (df['roe'] > 11) & (df['inc_net_profit_year_on_year'] > 10)]
-
-# print(df)
-
-'''获取股票估值指标'''
-df_valuation = get_fundamentals(query(valuation), statDate=datetime.datetime.today())
-print(df_valuation.head())
+def get_single_valuation(code, date, statDate):
+    '''
+    获取单个股票估值指标
+    :param code:
+    :param date:
+    :param statDate:
+    :return:
+    '''
+    data = get_fundamentals(query(valuation).filter(valuation.code == code), date=date, statDate=statDate)
+    return data
