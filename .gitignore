@@ -1,0 +1,16 @@
+*.cfg
+*.pyc
+*.log
+*.csv
+*.xlsx
+*.xls
+*.env
+*.txt
+*.db
+*.pem
+sftp-config.json
+db.sqlite3
+media/dna_f/
+media/files/
+.idea/
+
