@@ -42,7 +42,7 @@ def export_data(data, filename, type):
     '''
     file_root = data_root + type + "/" + filename + '.csv'
     data.index.names = ['date']
-    data.to_csv(file_root)
+    data.to_csv(file_root) # 判断一下file是否存在 > 存在：追加 / 不存在：保存
     print('已成功存储至: ', file_root)
 
 
@@ -95,3 +95,13 @@ def get_csv_data(code, type):
     '''
     file_root = data_root + type + "/" + code + '.csv'
     return pd.read_csv(file_root)
+
+
+def calculate_change_pct(data):
+    '''
+    涨跌幅 = (当期收盘价 - 前期收盘价) / 前期收盘价
+    :param data: dataframe，带有收盘价
+    :return: dataframe，带有涨跌幅
+    '''
+    data['close_pct'] = (data['close'] - data['close'].shift(1)) / data['close'].shift(1)
+    return data
