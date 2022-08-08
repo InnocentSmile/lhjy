@@ -7,6 +7,7 @@ auth('15717929717', 'Pzl123456')  # 账号是申请时所填写的手机号；�
 pd.set_option('display.max_rows', 100000)
 pd.set_option('display.max_columns', 10000)
 
+data_root = '/home/damon/PycharmProjects/lhjy/data/'
 
 def get_stock_list():
     '''
@@ -39,7 +40,8 @@ def export_data(data, filename, type):
     :type data: 股票数据类型 可以是： price，finance
     :return:
     '''
-    file_root = '/home/damon/PycharmProjects/lhjy/data/' + type + "/" + filename + '.csv'
+    file_root = data_root + type + "/" + filename + '.csv'
+    data.index.names = ['date']
     data.to_csv(file_root)
     print('已成功存储至: ', file_root)
 
@@ -83,3 +85,13 @@ def get_single_valuation(code, date, statDate):
     '''
     data = get_fundamentals(query(valuation).filter(valuation.code == code), date=date, statDate=statDate)
     return data
+
+
+def get_csv_data(code, type):
+    '''
+
+    :param code:
+    :return:
+    '''
+    file_root = data_root + type + "/" + code + '.csv'
+    return pd.read_csv(file_root)
