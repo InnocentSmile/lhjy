@@ -82,7 +82,7 @@ def caculate_max_drawdown(data):
     return data
 
 
-def caculte_sharpe(data):
+def calculte_sharpe(data):
     '''
     计算夏普比率，返回的是年华的夏普比率
     :param data:
@@ -113,23 +113,3 @@ def week_period_strategy(code, time_freq, start_date, end_date):
     # data = caculate_max_drawdown(data)  # 最大回撤
     return data
 
-
-if __name__ == '__main__':
-    # df = week_period_strategy('000001.XSHE', 'daily', None, datetime.datetime.today())
-    # # print(data[['close', 'weekday', 'buy_signal', 'sell_signal', 'signal', 'profit_pct']])
-    # print(df[['close', 'signal', 'profit_pct', 'cum_profit']])
-    # print(df.describe())
-    # df['cum_profit'].plot()
-    # plt.show()
-
-    # 查看平安银行最大回撤
-    # df = st.get_single_price('000001.XSHE', 'daily', "2006-01-01", "2021-01-01")
-    # df = caculate_max_drawdown(df)
-    # print(df[['close', 'roll_max', 'daily_dd', 'max_dd']])
-    # df[['daily_dd', 'max_dd']].plot()
-    # plt.show()
-
-    # 计算夏普比率
-    df = st.get_single_price('000001.XSHE', 'daily', "2006-01-01", "2021-01-01")
-    share = caculte_sharpe(df)
-    print(share)
