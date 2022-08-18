@@ -33,9 +33,7 @@ def calculate_pro_pct(data):
     :return:
     '''
     # 计算单次收益率： 开仓 平仓（开仓的全部股数）
-    data = data[data['signal'] != 0]
-    # data['profit_pct'] = (data['close'] - data['close'].shift(1)) / data['close']
-    data['profit_pct'] = data['close'].pct_change()
+    data.loc[data['signal'] != 0, 'profit_pct'] = data[data['signal'] != 0]['close'].pct_change()
     data = data[data['signal'] == -1]
     return data
 
@@ -112,4 +110,3 @@ def week_period_strategy(code, time_freq, start_date, end_date):
     data = calculate_cum_prof(data)  # 计算累计收益率
     # data = caculate_max_drawdown(data)  # 最大回撤
     return data
-
