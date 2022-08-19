@@ -22,6 +22,7 @@ def ma_strategy(data, short_window=5, long_window=20):
     :param long_window: 长期n日移动平均线，默认20
     :return:
     '''
+    print(f"========当前周期参数： {short_window}， {long_window}")
     data = pd.DataFrame(data)
     # 计算技术指标： ma短期 ma长期
     data['short_ma'] = data['close'].rolling(window=short_window).mean()
@@ -37,11 +38,11 @@ def ma_strategy(data, short_window=5, long_window=20):
     data = strat.calculate_pro_pct(data)
     # 计算累计收益
     data = strat.calculate_cum_prof(data)
-    # 数据预览
-    # print(data[['close', 'short_ma', 'long_ma', 'buy_signal', 'sell_signal', 'signal']])
 
     # 删除多余的columns
     data.drop(labels=['buy_signal', 'sell_signal'], axis=1)
+    # 数据预览
+    print(data[['close', 'short_ma', 'long_ma', 'signal', 'cum_profit']])
     return data
 
 
