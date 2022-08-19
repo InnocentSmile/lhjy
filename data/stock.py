@@ -167,3 +167,11 @@ def update_daily_price(stock_code, type='price'):
     print(f"{stock_code}股票数据已经更新成功！")
 
 
+def get_index_list(index_symbol="000300.XSHG"):
+    '''
+    获取指数成分股， 指数代码查询： https://www.joinquant.com/indexData
+    :param index_symbol: 指数的代码
+    :return:
+    '''
+    stocks = get_index_stocks(index_symbol)
+    return stocks
