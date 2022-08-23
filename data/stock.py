@@ -123,19 +123,23 @@ def get_csv_data(code, type):
     return pd.read_csv(file_root)
 
 
-def get_csv_price(code, start_date, end_date):
+def get_csv_price(code, start_date, end_date, columns=None):
     '''
     获取本地数据，且顺便完成数据更新工作
     :param code: str,股票代码
     :param start_date: str,开始日期
     :param end_date: str,结束日期
+    :param columns: list, 选取的字段
     :return: dataframe
     '''
     # 使用update直接更新
-    # update_daily_price(code)
+    update_daily_price(code)
     # 读取数据
     file_root = data_root + "price" + "/" + code + '.csv'
-    data = pd.read_csv(file_root, index_col='date')
+    if columns is None:
+        data = pd.read_csv(file_root, index_col='date')
+    else:
+        data = pd.read_csv(file_root, usecols=columns, index_col='date')
     # 根据日期筛选股票数据
     return data[(data.index >= start_date) & (data.index <= end_date)]
 
