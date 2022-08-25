@@ -53,9 +53,24 @@ def calculate_pro_pct2(data):
     return data
 
 
+def calculate_portfolio_return(data, signal, n):
+    '''
+    计算组合收益率
+    :param data: dataframe
+    :param signal: dataframe
+    :param n: int
+    :return:dataframe
+    '''
+    returns = data.copy()
+    # 投组收益率（等权重） = 收益率之和 / 个票个数
+    returns['profit_pct'] = (signal * data.shift(-1)).T.sum() / n
+    returns = calculate_cum_prof(returns)
+    return returns.shift(1)
+
+
 def calculate_cum_prof(data):
     '''
-    计算累计收益率
+    计算累计收益率(计算个股)
     :param data:
     :return:
     '''
@@ -63,15 +78,15 @@ def calculate_cum_prof(data):
     return data
 
 
-def caculate_max_drawdown(data):
+def caculate_max_drawdown(data, window = 252):
     '''
     计算最大回撤比
     :param data:
     :return:
     '''
     # 选取时间周期
-    window = 252
     # 选取时间周期中的最大净值
+    data['close'] = (1 + data['cum_profit']) * 1000
     data['roll_max'] = data['close'].rolling(window, min_periods=1).max()
     # 计算当天的回撤比 (谷值 - 疯值) / 峰值 = 谷值 / 峰值  - 1
     data['daily_dd'] = data['close'] / data['roll_max'] - 1
@@ -88,7 +103,8 @@ def calculte_sharpe(data):
     '''
     # 公式： sharpe = (回报率的均值 - 无风险利率) / 回报率的标准差
     # 因子项
-    daily_return = data['close'].pct_change()
+    # daily_return = data['close'].pct_change()
+    daily_return = data['profit_pct']
     avg_return = daily_return.mean()
     sd_return = daily_return.std()
     # 计算夏普
@@ -109,4 +125,25 @@ def week_period_strategy(code, time_freq, start_date, end_date):
     data = calculate_pro_pct2(data)  # 计算收益率
     data = calculate_cum_prof(data)  # 计算累计收益率
     # data = caculate_max_drawdown(data)  # 最大回撤
+    return data
+
+
+def evaluate_strategy(data):
+    # 评估策略效果： 总收益率 年华收益率 最大回撤 夏普比
+    data = calculate_cum_prof(data)
+    # 总收益率
+    total_return = data['cum_profit'].iloc[-1]
+    # 年华收益率
+    annual_return = data['cum_profit'].mean() * 12
+    # 最大回撤
+    data = caculate_max_drawdown(data, window=12)
+    max_drawdown = data['max_dd'].iloc[-1]
+    # 夏普比
+    sharpe,annual_sharpe = calculte_sharpe(data)
+    results = {
+        '总收益率': total_return,
+        '年华收益率': annual_return,
+        '最大回撤': max_drawdown,
+        '夏普比率': annual_sharpe,
+    }
     return data

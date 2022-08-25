@@ -48,14 +48,25 @@ def momentum(data_concat, shift_n=1, top_n=2):
     print(data_month.head())
     shift_return = data_month / data_month.shift(shift_n) - 1
     # 生成交易信号： 收益率排前n的 > 赢家组合 > 买入1， 排最后n个 > 输家 > 卖出-1
+    buy_singal = get_top_stocks(shift_return, top_n)
+    sell_singal = get_top_stocks(-1 * shift_return, top_n)
+    signal = buy_singal - sell_singal
+    print(signal)
+    # 计算投资组合收益率
+    returns = strat.calculate_portfolio_return(shift_return, signal, top_n * 2)
+    # 评估策略效果： 总收益率 年华收益率 最大回撤 夏普比
+    returns = strat.evaluate_strategy(returns)
     print(data_month.head())
-    return shift_return
+    return returns
 
 
 def get_top_stocks(data, top_n):
+    # 初始化信号容器
+    signals = pd.DataFrame(index=data.index, columns=data.columns)
     # 对data的每一行进行遍历，找里面的最大值，并利用bool函数标注0或者1信号
     for index, row in data.iterrows():
-        print(index, row.nlargest(top_n))
+        signals.loc[index] = row.isin(row.nlargest(top_n)).astype(np.int)
+    return signals
 
 
 if __name__ == '__main__':
@@ -64,4 +75,7 @@ if __name__ == '__main__':
     columns = ['date', 'close']
     data = get_data(start_date, end_date, columns)
     # 测试： 动量策略
-    momentum(data)
+    returns = momentum(data)
+    # 可视化每个月的收益率
+    returns.plot()
+    plt.show()
